@@ -1,0 +1,16 @@
+2026-04-25T16:31:45.394+08:00  INFO 16396 --- [restartedMain] com.Peter.ArticleApplication             : Starting ArticleApplication using Java 25.0.2 with PID 16396 (D:\java课程设计\activity-system-main\ProjektStarter\Exam\peter-article\peter-article-main\target\classes started by yck20 in D:\java课程设计\activity-system-main\ProjektStarter\Exam\peter-article)
+2026-04-25T16:31:45.397+08:00  INFO 16396 --- [restartedMain] com.Peter.ArticleApplication             : No active profile set, falling back to 1 default profile: "default"
+2026-04-25T16:31:45.435+08:00  INFO 16396 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-25T16:31:45.436+08:00  INFO 16396 --- [restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-25T16:31:46.026+08:00  WARN 16396 --- [restartedMain] o.m.s.mapper.ClassPathMapperScanner      : No MyBatis mapper was found in '[com.Peter]' package. Please check your configuration.
+2026-04-25T16:31:46.437+08:00  INFO 16396 --- [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8490 (http)
+2026-04-25T16:31:46.456+08:00  INFO 16396 --- [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-25T16:31:46.457+08:00  INFO 16396 --- [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-25T16:31:46.516+08:00  INFO 16396 --- [restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1080 ms
+2026-04-25T16:31:47.051+08:00  INFO 16396 --- [restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8490 (http) with context path '/'
+2026-04-25T16:31:47.056+08:00  INFO 16396 --- [restartedMain] com.Peter.ArticleApplication             : Started ArticleApplication in 2.037 seconds (process running for 2.613)
+2026-04-25T16:33:02.681+08:00  INFO 16396 --- [http-nio-8490-exec-7] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-25T16:33:02.682+08:00  INFO 16396 --- [http-nio-8490-exec-7] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-25T16:33:02.683+08:00  INFO 16396 --- [http-nio-8490-exec-7] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-04-25T16:33:20.902+08:00  INFO 16396 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-25T16:33:20.913+08:00  INFO 16396 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete

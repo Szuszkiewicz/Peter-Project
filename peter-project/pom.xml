@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.0.3</version>
+    <relativePath/>
+  </parent>
+
+
+  <groupId>com.Peter</groupId>
+  <artifactId>peter-project</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>peter-project</name>
+  <description>Activity System - User, Article and Comment Management</description>
+
+  <modules>
+    <module>../peter-user</module>
+    <module>../peter-article</module>
+    <module>../dtc-comment</module>
+  </modules>
+
+  <properties>
+    <java.version>21</java.version>
+    <apache.commons.version>3.14.0</apache.commons.version>
+    <fastjson2.version>2.0.61</fastjson2.version>
+    <hutool.version>5.8.40</hutool.version>
+    <jjwt.version>0.11.5</jjwt.version>
+    <mybatis.version>4.0.1</mybatis.version>
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <easyexcel.version>2.2.4</easyexcel.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- peter-user 模块 -->
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-user-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-user-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-user-orm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-user-controller</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- peter-article 模块 -->
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-article-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-article-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-article-orm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-article-controller</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- dtc-comment 模块 -->
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>dtc-comment-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>dtc-comment-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>dtc-comment-orm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>dtc-comment-controller</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- 通用依赖版本管理 -->
+      <dependency>
+        <groupId>com.alibaba.fastjson2</groupId>
+        <artifactId>fastjson2</artifactId>
+        <version>${fastjson2.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-all</artifactId>
+        <version>${hutool.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-api</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-impl</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt-jackson</artifactId>
+        <version>${jjwt.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mybatis.spring.boot</groupId>
+        <artifactId>mybatis-spring-boot-starter</artifactId>
+        <version>${mybatis.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>easyexcel</artifactId>
+        <version>${easyexcel.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${apache.commons.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
