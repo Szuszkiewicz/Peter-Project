@@ -55,20 +55,24 @@ public class ArticleController {
      */
     @PostMapping("/delete")
     public BaseResult< Boolean> deleteArticle(@RequestBody DeleteArticleParam deleteArticleParam){
-        log.info("删除文章-入参：{}", JSON.toJSON(deleteArticleParam));
-        //参数校验
-        Assert.isTrue(deleteArticleParam!=null, "参数不能为空");
-        Assert.isTrue(deleteArticleParam.getUserId()!=null, "用户ID不能为空");
-        Assert.isTrue(deleteArticleParam.getId()!=null, "ID不能为空");
-        //删除
-        DeleteArticleInfoDto deleteArticleInfoDto=new DeleteArticleInfoDto();
-        deleteArticleInfoDto.setId(Long.valueOf(deleteArticleParam.getId()));
-        deleteArticleInfoDto.setUserId(deleteArticleParam.getUserId());
-        int deleteCount = articleService.DeleteArticle(deleteArticleInfoDto);
+        try {
+            //参数校验
+            Assert.isTrue(deleteArticleParam != null, "参数不能为空");
+            Assert.isTrue(deleteArticleParam.getUserId() != null, "用户ID不能为空");
+            Assert.isTrue(deleteArticleParam.getId() != null, "ID不能为空");
+            //删除
+            DeleteArticleInfoDto deleteArticleInfoDto = new DeleteArticleInfoDto();
+            deleteArticleInfoDto.setId(Long.valueOf(deleteArticleParam.getId()));
+            deleteArticleInfoDto.setUserId(deleteArticleParam.getUserId());
+            int deleteCount = articleService.DeleteArticle(deleteArticleInfoDto);
 
-        //返回结果
-        log.info("删除文章-出参：{}", deleteCount);
+            //返回结果
+            log.info("删除文章-出参：{}", deleteCount);
 
-        return BaseResultUtils.generateSuccess(deleteCount>0);
+            return BaseResultUtils.generateSuccess(deleteCount > 0);
+        } catch (Exception e) {
+            return BaseResultUtils.generateError(e.getMessage());
+        }
+
     }
 }
