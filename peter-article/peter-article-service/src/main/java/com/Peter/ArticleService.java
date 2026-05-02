@@ -1,7 +1,11 @@
 package com.Peter;
 
+import com.Peter.dto.ArticleDetailInfoDto;
 import com.Peter.dto.DeleteArticleInfoDto;
 import com.Peter.dto.PostArticleInfoDto;
+import com.Peter.dto.QueryArticleInfoDto;
+
+import java.util.List;
 
 public interface ArticleService {
     /**
@@ -15,5 +19,9 @@ public interface ArticleService {
      * 删除文章
      */
     int DeleteArticle(DeleteArticleInfoDto deleteArticleInfoDto);
+    /**
+     * 获取文章列表
+     */
+    List<ArticleDetailInfoDto> QueryArticleList(QueryArticleInfoDto queryArticleInfoDto);
 
 }
