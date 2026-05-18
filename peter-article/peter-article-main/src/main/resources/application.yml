@@ -2,10 +2,42 @@ server:
   port: 8490
 #数据源配置
 spring:
+  application:
+    name: peter-article
+  config:
+    import: nacos:peter-article.yaml?group=DEFAULT_GROUP
   datasource:
-    url: jdbc:mysql://localhost:3306/dtc_comment?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://47.104.144.251:3306/peter_ article?allowPublicKeyRetrieval=true&useSSL=false
     username: root
-    password: yck72352
+    password: Yck72352@
+    hikari:
+      # 连接池最大连接数
+      maximum-pool-size: 60
+      #链接超时时间
+      connection-timeout: 60000
+      #空闲链接最大存活时间
+      idle-timeout: 60000
+      #此属性控制池中连接的最长生命周期
+      max-lifetime: 60000
+      #池中维护的最小空闲连接数
+      minimum-idle: 10
+      #链接泄漏检测
+      leak-detection-threshold: 30000
+      #连接将被测试活动的最大时间量
+      validation-timeout: 3000
+      #连接到数据库时等待的最长时间
+      login-timeout: 5
+  cloud:
+    nacos:
+      config:
+        server-addr: 47.104.144.251:8848
+        username: nacos
+        password: nacos
+        # prefix, file-extension, group 等配置都移到了 import 语句中，这里不再需要
+      discovery:
+        server-addr: 47.104.144.251:8848
+        username: nacos
+        password: nacos
 
 # mybatis信息配置
 mybatis:

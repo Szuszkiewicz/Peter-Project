@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.3</version>
+    <version>4.0.0</version>
     <relativePath/>
   </parent>
 
@@ -24,10 +24,12 @@
     <module>../peter-user</module>
     <module>../peter-article</module>
     <module>../dtc-comment</module>
+      <module>peter-gateway</module>
   </modules>
 
   <properties>
     <java.version>21</java.version>
+    <spring-cloud.version>2025.1.0</spring-cloud.version>
     <apache.commons.version>3.14.0</apache.commons.version>
     <fastjson2.version>2.0.61</fastjson2.version>
     <hutool.version>5.8.40</hutool.version>
@@ -155,6 +157,18 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>${apache.commons.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>1.18.42</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
