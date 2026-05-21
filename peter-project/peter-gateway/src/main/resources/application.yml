@@ -1,0 +1,21 @@
+server:
+  port: 8494
+  address: 0.0.0.0
+spring:
+  profiles:
+    active: dev
+
+# mybatis信息配置
+#mybatis:
+#  mapper-locations: classpath:mapper/*.xml,classpath:dao/*.xml
+#  type-aliases-package: com.Peter.entity
+#  configuration:
+#    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    root: info
+  file:
+    name : gateway.log
+
+
