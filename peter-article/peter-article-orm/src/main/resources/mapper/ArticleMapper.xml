@@ -32,4 +32,10 @@
   <update id="subtractLikesCount">
     update article set likes = likes - 1 where id = #{id}
   </update>
+  <update id="addCollectsCount">
+    update article set collects = collects + 1 where id = #{id}
+  </update>
+  <update id="subtractCollectsCount">
+    update article set collects = collects - 1 where id = #{id}
+  </update>
 </mapper>

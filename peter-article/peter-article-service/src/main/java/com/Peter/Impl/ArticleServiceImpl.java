@@ -136,6 +136,15 @@ public class ArticleServiceImpl implements ArticleService {
         return articleMapper.subtractLikesCount(id);
     }
 
+    @Override
+    public int addCollectsCount(Long id){
+        return articleMapper.addCollectsCount(id);
+    }
+    @Override
+    public int subtractCollectsCount(Long id){
+        return articleMapper.subtractCollectsCount(id);
+    }
+
     private ArticleExample buildArticleExample(QueryArticleInfoDto queryArticleInfoDto) {
         if(queryArticleInfoDto== null){
             return null;

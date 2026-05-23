@@ -23,5 +23,28 @@ public interface ArticleService {
      * 获取文章列表
      */
     List<ArticleDetailInfoDto> QueryArticleList(QueryArticleInfoDto queryArticleInfoDto);
-
+    /**
+     * 添加文章点赞数
+     * @param id
+     * @  return
+     */
+    int addLikesCount(Long id);
+    /**
+     *  减少文章点赞数
+     *  @param id
+     *  @return
+     */
+    int subtractLikesCount(Long id);
+    /**
+     * 添加文章收藏数
+     * @param id
+     * @return
+     */
+    int addCollectsCount(Long id);
+    /**
+     * 减少文章收藏数
+     * @param id
+     * @return
+     */
+    int subtractCollectsCount(Long id);
 }

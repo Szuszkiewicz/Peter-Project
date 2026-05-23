@@ -72,6 +72,25 @@ public class Article implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+    /**
+     * 收藏数
+     */
+    private Integer collects;
+
+    /**
+     * 覆盖
+     */
+    private String cover;
+
+    /**
+     * 降序
+     */
+    private String desc;
+
+    /**
+     * 标签
+     */
+    private String tags;
 
     /**
      * 内容
@@ -184,6 +203,38 @@ public class Article implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public Integer getCollects() {
+        return collects;
+    }
+
+    public void setCollects(Integer collects) {
+        this.collects = collects;
+    }
+
+    public String getCover() {
+        return cover;
+    }
+
+    public void setCover(String cover) {
+        this.cover = cover;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
     public String getContent() {
         return content;
     }
@@ -217,6 +268,10 @@ public class Article implements Serializable {
             && (this.getCommentsCount() == null ? other.getCommentsCount() == null : this.getCommentsCount().equals(other.getCommentsCount()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
+            && (this.getCollects() == null ? other.getCollects() == null : this.getCollects().equals(other.getCollects()))
+            && (this.getCover() == null ? other.getCover() == null : this.getCover().equals(other.getCover()))
+            && (this.getDesc() == null ? other.getDesc() == null : this.getDesc().equals(other.getDesc()))
+            && (this.getTags() == null ? other.getTags() == null : this.getTags().equals(other.getTags()))
             && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()));
     }
 
@@ -237,6 +292,10 @@ public class Article implements Serializable {
         result = prime * result + ((getCommentsCount() == null) ? 0 : getCommentsCount().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
+        result = prime * result + ((getCollects() == null) ? 0 : getCollects().hashCode());
+        result = prime * result + ((getCover() == null) ? 0 : getCover().hashCode());
+        result = prime * result + ((getDesc() == null) ? 0 : getDesc().hashCode());
+        result = prime * result + ((getTags() == null) ? 0 : getTags().hashCode());
         result = prime * result + ((getContent() == null) ? 0 : getContent().hashCode());
         return result;
     }
@@ -260,6 +319,10 @@ public class Article implements Serializable {
         sb.append(", commentsCount=").append(commentsCount);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateTime=").append(updateTime);
+        sb.append(", collects=").append(collects);
+        sb.append(", cover=").append(cover);
+        sb.append(", desc=").append(desc);
+        sb.append(", tags=").append(tags);
         sb.append(", content=").append(content);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
