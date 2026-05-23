@@ -34,7 +34,7 @@ public class ArticleController {
      * @return
      */
     @PostMapping("/post")
-    public BaseResult<Boolean> postArticle(@RequestBody ArticleParam articleParam){
+    public BaseResult<Long> postArticle(@RequestBody ArticleParam articleParam){
         log.info("发布文章-入参：{}", JSON.toJSON(articleParam));
         //参数校验
         checkPostArticleParam(articleParam);
@@ -43,8 +43,8 @@ public class ArticleController {
         BeanUtils.copyProperties(articleParam,postArticleInfoDto);
         int count=articleService.PostArticle(postArticleInfoDto);
         //返回结果
-        log.info("发布文章-出参：{}", count>0);
-        return BaseResultUtils.generateSuccess( count>0);
+        log.info("发布文章-出参：{},文章id:{}", count>0,postArticleInfoDto.getId());
+        return BaseResultUtils.generateSuccess( Long.valueOf(postArticleInfoDto.getId()));
     }
 
     private void checkPostArticleParam(ArticleParam articleParam) {

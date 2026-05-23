@@ -1,5 +1,6 @@
 package com.Peter.Impl;
 
+import com.Peter.ArticlePostService;
 import com.Peter.ArticleService;
 import com.Peter.dao.ArticleDao;
 import com.Peter.dto.ArticleDetailInfoDto;
@@ -8,6 +9,8 @@ import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.dto.QueryArticleInfoDto;
 import com.Peter.entity.Article;
 import com.Peter.entity.ArticleExample;
+import com.Peter.enums.ArticleOperationTypeEnums;
+import com.Peter.factory.ArticleFactory;
 import com.Peter.mapper.ArticleMapper;
 import com.Peter.utils.DateUtils;
 import com.alibaba.fastjson2.JSON;
@@ -32,30 +35,9 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public int PostArticle(PostArticleInfoDto postArticleInfoDto) {
         try {
-            log.info("发布文章-PostArticle-service-入参：{}", JSON.toJSONString(postArticleInfoDto));
-            if(postArticleInfoDto.getId()!= null){
-              Article article= articleDao.selectByPrimaryKey(Long.valueOf(postArticleInfoDto.getId()));
-              article.setContent(postArticleInfoDto.getContent());
-              article.setTitle(postArticleInfoDto.getTitle());
-              article.setCategoryId(Long.valueOf(postArticleInfoDto.getCategoryId()));
-              int updateCount=articleDao.updateByPrimaryKeySelective(article);
-              log.info("发布文章-PostArticle-service-出参：{}", updateCount);
-              return updateCount;
-                //修改
-            }else{
-                //新增
-             Article article=new Article();
-             article.setModule(postArticleInfoDto.getModule());
-             article.setTitle(postArticleInfoDto.getTitle());
-             article.setType(postArticleInfoDto.getType().byteValue());
-             article.setCategoryId(Long.valueOf(postArticleInfoDto.getCategoryId()));
-             article.setContent(postArticleInfoDto.getContent());
-             article.setUserId(Long.valueOf(postArticleInfoDto.getUserId()));
-             article.setStatus(postArticleInfoDto.getStatus().byteValue());
-             int insertCount=articleDao.insertSelective(article);
-             log.info("发布文章-新增-PostArticle-service-出参：{}", insertCount);
-             return insertCount;
-            }
+            //修改为策略模式
+            ArticlePostService articlePostService=ArticleFactory.fetchArticleService(postArticleInfoDto.getId()!=null? ArticleOperationTypeEnums.UPDATE:ArticleOperationTypeEnums.ADD);
+            return articlePostService.doAction(postArticleInfoDto);
         }catch (Exception e){
             log.error("发布文章-PostArticle-service-异常：", e);
             return -1;

@@ -12,17 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * 添加文章
  */
 @Slf4j
-@Service
 public class AddArticleServiceImpl implements ArticlePostService, InitializingBean {
-
     @Autowired
     private ArticleDao articleDao;
     @Override
     public int doAction(PostArticleInfoDto postArticleInfoDto){
-        log.info("发布文章-新增-PostArticle-service-入参：{}", postArticleInfoDto);
         Article article=new Article();
         article.setModule(postArticleInfoDto.getModule());
         article.setTitle(postArticleInfoDto.getTitle());
@@ -37,6 +33,6 @@ public class AddArticleServiceImpl implements ArticlePostService, InitializingBe
     }
     @Override
     public void afterPropertiesSet() throws Exception {
-        ArticleFactory.init(ArticleOperationTypeEnums.ADD,this);
+        ArticleFactory.init(ArticleOperationTypeEnums.ADD, this);
     }
 }
