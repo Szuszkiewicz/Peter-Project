@@ -7,9 +7,11 @@ spring:
   config:
     import: nacos:peter-article.yaml?group=DEFAULT_GROUP
   datasource:
-    url: jdbc:mysql://47.104.144.251:3306/peter_ article?allowPublicKeyRetrieval=true&useSSL=false
+#    url: jdbc:mysql://47.104.144.251:3306/dtc_comment?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/dtc_comment?allowPublicKeyRetrieval=true&useSSL=false
     username: root
-    password: Yck72352@
+#    password: Yck72352@
+    password: yck72352
     hikari:
       # 连接池最大连接数
       maximum-pool-size: 60

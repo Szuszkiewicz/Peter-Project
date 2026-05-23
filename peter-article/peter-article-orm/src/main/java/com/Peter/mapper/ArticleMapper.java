@@ -10,4 +10,8 @@ public interface ArticleMapper {
     int addLikesCount(Long  id);
 
     int subtractLikesCount(Long  id);
+
+    int addCollectsCount(Long  id);
+
+    int subtractCollectsCount(Long  id);
 }

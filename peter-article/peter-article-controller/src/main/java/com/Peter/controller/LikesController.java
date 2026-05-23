@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/likes")
+@RequestMapping("/like")
 public class LikesController {
     @Autowired
     private LikesService likesService;
     /**
      * 点赞和取消点赞
+     * todo 收藏明细和收藏总数 数据并未保证一致性
      * @param likesParam
      * @return
      */
@@ -31,8 +32,8 @@ public class LikesController {
         Assert.isTrue(likesParam.getTargetId()!=null,"点赞目标不能为空");
         LikesInfoDto likesInfoDto=new LikesInfoDto();
         BeanUtils.copyProperties(likesParam,likesInfoDto);
-        int set=likesService.set(likesInfoDto);
-        if(set>0){
+        int likesSet =likesService.set(likesInfoDto);
+        if(likesSet >0){
             return BaseResultUtils.success();
         }
         return BaseResultUtils.generateError("点赞失败");
