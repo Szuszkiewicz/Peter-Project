@@ -48,7 +48,10 @@ public class ArticleDetailInfoDto {
      * 点赞数
      */
     private Integer likes;
-
+    /**
+     * 收藏数
+     */
+    private Integer collects;
     /**
      * 评论数
      */
@@ -69,5 +72,18 @@ public class ArticleDetailInfoDto {
      * 内容
      */
     private String content;
+    /**
+     * 封面
+     */
+    private String cover;
+    /**
+     * 描述
+     */
+    private String desc;
+    /**
+     * 标签
+     */
+    private String tags;
+
 
 }

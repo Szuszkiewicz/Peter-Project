@@ -78,12 +78,12 @@ public class Article implements Serializable {
     private Integer collects;
 
     /**
-     * 覆盖
+     * 封面
      */
     private String cover;
 
     /**
-     * 降序
+     * 简介
      */
     private String desc;
 

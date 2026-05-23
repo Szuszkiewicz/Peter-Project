@@ -86,31 +86,46 @@ public class ArticleController {
      * 查询文章列表
      *
      */
-    @PostMapping("/query/list")
-    public BaseResult<List<ArticleDetailInfoRes>> queryArticleList(@RequestBody ArticleParam articleParam){
+    @RequestMapping("/query/list")
+    public BaseResult<List<ArticleDetailInfoRes>> queryArticleList(@RequestBody ArticleParam articleParam) {
         try {
             log.info("查询文章列表-入参：{}", JSON.toJSON(articleParam));
             //参数校验
-            Assert.isTrue(articleParam!= null, "参数不能为空");
+            Assert.isTrue(articleParam != null, "参数不能为空");
             Assert.isTrue(articleParam.getUserId() != null, "用户ID不能为空");
 
             //查询
             QueryArticleInfoDto queryArticleInfoDto = new QueryArticleInfoDto();
             BeanUtils.copyProperties(articleParam, queryArticleInfoDto);
-           if(StringUtils.isNotBlank(articleParam.getId())){
-               queryArticleInfoDto.setId(Long.valueOf(articleParam.getId()));
-           }
+            if (StringUtils.isNotBlank(articleParam.getId())) {
+                queryArticleInfoDto.setId(Long.valueOf(articleParam.getId()));
+            }
 
             List<ArticleDetailInfoDto> articleDetailInfoDtos = articleService.QueryArticleList(queryArticleInfoDto);
-            List<ArticleDetailInfoRes> targetList=buildArticleList(articleDetailInfoDtos);
-            BeanUtils.copyProperties(articleDetailInfoDtos,targetList);
-            log.info("查询文章列表-出参：{}",targetList);
-           //返回结果集
+            List<ArticleDetailInfoRes> targetList = buildArticleList(articleDetailInfoDtos);
+            BeanUtils.copyProperties(articleDetailInfoDtos, targetList);
+            log.info("查询文章列表-出参：{}", targetList);
+            //返回结果集
             return BaseResultUtils.generateSuccess(targetList);
         } catch (Exception e) {
             return BaseResultUtils.generateError(e.getMessage());
         }
-
+    }
+        /**
+         * 根据id查询文章
+         * @param
+         * @return
+         */
+        @RequestMapping("/query")
+        public BaseResult<ArticleDetailInfoRes> queryArticleById(@RequestParam("id") String id){
+        log.info("查询文章-ById-入参：{}", id);
+        //参数校验
+            Assert.isTrue(StringUtils.isNotBlank(id), "id不能为空");
+        //根据id查询文章
+        ArticleDetailInfoDto articleDetailInfoDto=articleService.queryArticleById(Long.valueOf(id));
+        ArticleDetailInfoRes articleDetailInfoRes = new ArticleDetailInfoRes();
+        BeanUtils.copyProperties(articleDetailInfoDto,articleDetailInfoRes);
+        return BaseResultUtils.generateSuccess(articleDetailInfoRes);
     }
 
     private List<ArticleDetailInfoRes> buildArticleList(List<ArticleDetailInfoDto> articleDetailInfoDtos) {

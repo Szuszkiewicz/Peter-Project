@@ -24,6 +24,10 @@ public interface ArticleService {
      */
     List<ArticleDetailInfoDto> QueryArticleList(QueryArticleInfoDto queryArticleInfoDto);
     /**
+     * 根据id查询文章
+     */
+    ArticleDetailInfoDto queryArticleById(Long id);
+    /**
      * 添加文章点赞数
      * @param id
      * @  return
