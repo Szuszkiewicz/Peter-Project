@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -107,6 +108,39 @@ public class ArticleServiceImpl implements ArticleService {
         catch (Exception e){
             log.error("查询文章列表-QueryArticleList-service-异常：", e);
             return new ArrayList<>();
+        }
+    }
+    @Override
+    public  ArticleDetailInfoDto queryArticleById(Long id) {
+        try {
+            log.info("查询文章列表-queryArticleById-service-入参：{}", id);
+            Article article = articleDao.selectByPrimaryKey(id);
+            ArticleDetailInfoDto detailInfoDto = new ArticleDetailInfoDto();
+            if (article.getIsDelete().equals((byte) 1)) {
+                log.error("文章已被删除:{}", id);
+                return null;
+            }
+            detailInfoDto.setId(article.getId());
+            detailInfoDto.setUserId(article.getUserId());
+            detailInfoDto.setCover(article.getCover());
+            detailInfoDto.setDesc(article.getDesc());
+            detailInfoDto.setTags(article.getTags());
+            detailInfoDto.setContent(article.getContent());
+            detailInfoDto.setTitle(article.getTitle());
+            detailInfoDto.setCategoryId(article.getCategoryId());
+            detailInfoDto.setType(article.getType().intValue());
+            detailInfoDto.setCommentsCount(article.getCommentsCount());
+            detailInfoDto.setModule(article.getModule());
+            detailInfoDto.setLikes(article.getLikes());
+            detailInfoDto.setCollects(article.getCollects());
+            detailInfoDto.setViews(article.getViews());
+            detailInfoDto.setStatus(article.getStatus().intValue());
+            detailInfoDto.setCreateTime(DateUtils.date2Str(article.getCreateTime(), DateUtils.DATE_FORMAT));
+            detailInfoDto.setUpdateTime(DateUtils.date2Str(article.getUpdateTime(), DateUtils.DATE_FORMAT));
+            return detailInfoDto;
+        } catch (Exception e) {
+            log.error("根据id查询文章-queryArticleById-service-异常：", e);
+            return null;
         }
     }
     @Override

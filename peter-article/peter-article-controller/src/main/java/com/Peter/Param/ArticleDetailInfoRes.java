@@ -46,6 +46,10 @@ public class ArticleDetailInfoRes {
      * 点赞数
      */
     private Integer likes;
+    /**
+     * 收藏数
+     */
+    private Integer collects;
 
     /**
      * 评论数
@@ -62,6 +66,20 @@ public class ArticleDetailInfoRes {
      * 更新时间
      */
     private String updateTime;
+    /**
+     * 封面
+     */
+    private String cover;
+
+    /**
+     * 简介
+     */
+    private String desc;
+
+    /**
+     * 标签
+     */
+    private String tags;
 
     /**
      * 内容
