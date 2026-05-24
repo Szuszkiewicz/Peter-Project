@@ -1,13 +1,13 @@
 package com.Peter.enums;
 
-public enum ArticleTypeEnums {
+public enum ModuleTypeEnum {
     WEBSITE(1,"网站"),
 
     ;
     int code;
     String msg;
 
-    ArticleTypeEnums(int code, String msg) {
+    ModuleTypeEnum(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
@@ -20,10 +20,10 @@ public enum ArticleTypeEnums {
         return msg;
     }
 
-    public static ArticleTypeEnums getByCode(int code){
-        ArticleTypeEnums[] values = ArticleTypeEnums.values();
+    public static ModuleTypeEnum getByCode(int code){
+        ModuleTypeEnum[] values = ModuleTypeEnum.values();
         for (int i = 0; i < values.length; i++) {
-            ArticleTypeEnums value = values[i];
+            ModuleTypeEnum value = values[i];
             if(value.getCode()==code){
                 return value;
             }

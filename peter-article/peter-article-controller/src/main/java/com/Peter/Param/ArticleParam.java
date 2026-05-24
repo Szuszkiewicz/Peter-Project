@@ -35,6 +35,13 @@ public class ArticleParam {
      * 分类id
      */
     private Integer categoryId;
-
+    /**
+     * 页数
+     */
+    private Integer pageNum;
+    /**
+     * 每页数量
+     */
+    private Integer pageSize;
 
 }

@@ -30,6 +30,16 @@ public class QueryArticleInfoDto {
      * 分类ID
      */
     private Long categoryId;
-
-
+   /**
+     * 页码
+     */
+    private Integer pageNum;
+   /**
+     * 每页数量
+     */
+    private Integer pageSize;
+    /**
+     * 是否已删除
+     */
+    private Byte isDeleted;
 }

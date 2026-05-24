@@ -2,14 +2,13 @@ package com.Peter.controller;
 
 import cn.hutool.core.lang.Assert;
 import com.Peter.ArticleService;
-import com.Peter.Param.ArticleDetailInfoRes;
-import com.Peter.Param.ArticleParam;
-import com.Peter.Param.BaseResult;
-import com.Peter.Param.DeleteArticleParam;
+import com.Peter.Param.*;
 import com.Peter.dto.ArticleDetailInfoDto;
 import com.Peter.dto.DeleteArticleInfoDto;
 import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.dto.QueryArticleInfoDto;
+import com.Peter.enums.ArticleTypeEnum;
+import com.Peter.enums.ModuleTypeEnum;
 import com.Peter.utils.BaseResultUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -87,31 +87,48 @@ public class ArticleController {
      *
      */
     @RequestMapping("/query/list")
-    public BaseResult<List<ArticleDetailInfoRes>> queryArticleList(@RequestBody ArticleParam articleParam) {
+    public PageResultWrapper<ArticleDetailInfoRes> queryArticleList(@RequestBody ArticleParam articleParam) {
         try {
             log.info("查询文章列表-入参：{}", JSON.toJSON(articleParam));
             //参数校验
             Assert.isTrue(articleParam != null, "参数不能为空");
-            Assert.isTrue(articleParam.getUserId() != null, "用户ID不能为空");
+            Assert.isTrue(articleParam.getModule() != null, "文章模块不能为空");
 
-            //查询
-            QueryArticleInfoDto queryArticleInfoDto = new QueryArticleInfoDto();
-            BeanUtils.copyProperties(articleParam, queryArticleInfoDto);
-            if (StringUtils.isNotBlank(articleParam.getId())) {
-                queryArticleInfoDto.setId(Long.valueOf(articleParam.getId()));
-            }
-
-            List<ArticleDetailInfoDto> articleDetailInfoDtos = articleService.QueryArticleList(queryArticleInfoDto);
-            List<ArticleDetailInfoRes> targetList = buildArticleList(articleDetailInfoDtos);
-            BeanUtils.copyProperties(articleDetailInfoDtos, targetList);
-            log.info("查询文章列表-出参：{}", targetList);
+          //构建查询条件
+            QueryArticleInfoDto queryArticleInfoDto = buildQueryArticleInfoDto(articleParam);
+            //查询总数
+            int total=articleService.countArticle(queryArticleInfoDto);
+            List<ArticleDetailInfoDto> articleDetailInfoDto = articleService.QueryArticleList(queryArticleInfoDto);
+            List<ArticleDetailInfoRes> targetList = buildArticleList(articleDetailInfoDto);
+            log.info("查询文章列表-出参：{}",JSON.toJSONString(targetList));
             //返回结果集
-            return BaseResultUtils.generateSuccess(targetList);
+            return PageResultWrapper.page(targetList,total,queryArticleInfoDto.getPageNum(),queryArticleInfoDto.getPageSize());
         } catch (Exception e) {
-            return BaseResultUtils.generateError(e.getMessage());
+            log.error("查询文章列表-异常：{}", e.getMessage());
+            return PageResultWrapper.fail("-1","查询文章列表异常");
         }
     }
-        /**
+
+   private QueryArticleInfoDto buildQueryArticleInfoDto(ArticleParam articleParam) {
+       QueryArticleInfoDto queryArticleInfoDto = new QueryArticleInfoDto();
+       BeanUtils.copyProperties(articleParam, queryArticleInfoDto);
+       if (StringUtils.isNotBlank(articleParam.getId())) {
+           queryArticleInfoDto.setId(Long.valueOf(articleParam.getId()));
+       }
+//       if (!CollectionUtils.isEmpty(articleParam.getIds())) {
+//           List<Long> ids = articleParam.getIds().stream().map(x -> {
+//               return Long.valueOf(x);
+//           }).collect(Collectors.toList());
+//           QueryArticleInfoDto.setIds(ids);
+//       }
+       if (queryArticleInfoDto.getPageNum() == null || queryArticleInfoDto.getPageSize() == null) {
+           queryArticleInfoDto.setPageNum(1);
+           queryArticleInfoDto.setPageSize(10);
+       }
+       return queryArticleInfoDto;
+    }
+
+    /**
          * 根据id查询文章
          * @param
          * @return
@@ -127,6 +144,22 @@ public class ArticleController {
         BeanUtils.copyProperties(articleDetailInfoDto,articleDetailInfoRes);
         return BaseResultUtils.generateSuccess(articleDetailInfoRes);
     }
+    /**
+     * 分页查询
+     * @param
+     * @return
+     */
+    @RequestMapping("/selectPage")
+    public PageResultWrapper<ArticleDetailInfoRes> selectPage(ArticleParam articleParam,
+                                                              @RequestParam(defaultValue="1")Integer pageNum,
+                                                              @RequestParam(defaultValue="10")Integer pageSize){
+        articleParam.setPageNum(pageNum);
+        articleParam.setPageSize(pageSize);
+        articleParam.setModule(ModuleTypeEnum.WEBSITE.getCode());
+        articleParam.setType(ArticleTypeEnum.ARTICLE.getCode());
+        return this.queryArticleList(articleParam);
+    }
+
 
     private List<ArticleDetailInfoRes> buildArticleList(List<ArticleDetailInfoDto> articleDetailInfoDtos) {
         if(CollectionUtils.isEmpty(articleDetailInfoDtos)){

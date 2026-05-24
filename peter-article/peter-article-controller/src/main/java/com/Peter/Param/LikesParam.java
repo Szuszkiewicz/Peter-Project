@@ -1,5 +1,6 @@
 package com.Peter.Param;
 
+import com.Peter.enums.ArticleTypeEnum;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,7 @@ public class LikesParam {
      */
     private Long userId;
     /**
-     * @see com.Peter.enums.ModuleTypeEnums
+     * @see ArticleTypeEnum
      */
     private Integer module;
 }
