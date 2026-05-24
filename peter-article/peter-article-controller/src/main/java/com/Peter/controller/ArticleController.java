@@ -7,6 +7,8 @@ import com.Peter.dto.ArticleDetailInfoDto;
 import com.Peter.dto.DeleteArticleInfoDto;
 import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.dto.QueryArticleInfoDto;
+import com.Peter.entity.Article;
+import com.Peter.entity.ArticleExample;
 import com.Peter.enums.ArticleTypeEnum;
 import com.Peter.enums.ModuleTypeEnum;
 import com.Peter.utils.BaseResultUtils;
@@ -142,6 +144,7 @@ public class ArticleController {
         ArticleDetailInfoDto articleDetailInfoDto=articleService.queryArticleById(Long.valueOf(id));
         ArticleDetailInfoRes articleDetailInfoRes = new ArticleDetailInfoRes();
         BeanUtils.copyProperties(articleDetailInfoDto,articleDetailInfoRes);
+        articleService.addViewsCount(Long.valueOf(id));
         return BaseResultUtils.generateSuccess(articleDetailInfoRes);
     }
     /**
@@ -149,7 +152,7 @@ public class ArticleController {
      * @param
      * @return
      */
-    @RequestMapping("/selectPage")
+    @GetMapping("/selectPage")
     public PageResultWrapper<ArticleDetailInfoRes> selectPage(ArticleParam articleParam,
                                                               @RequestParam(defaultValue="1")Integer pageNum,
                                                               @RequestParam(defaultValue="10")Integer pageSize){
@@ -160,7 +163,27 @@ public class ArticleController {
         return this.queryArticleList(articleParam);
     }
 
-
+    /**
+     * 查询文章榜单
+     *
+     */
+    @GetMapping("/selectRank")
+    public BaseResult<List<ArticleDetailInfoDto>> selectRank(){
+        List<ArticleDetailInfoDto> list=articleService.selectRank();
+        return BaseResultUtils.generateSuccess(list);
+    }
+    @PostMapping("/addViews")
+    public BaseResult<Boolean> addViews(@RequestParam Long  id){
+        try {
+            log.info("添加文章浏览量-入参：{}", id);
+            Assert.isTrue(id != null, "id不能为空");
+            int count=articleService.addViewsCount(id);
+            log.info("添加文章浏览量-出参：{}", count);
+            return BaseResultUtils.generateSuccess(count>0);
+        }catch (Exception e){
+            return BaseResultUtils.generateError(e.getMessage());
+        }
+    }
     private List<ArticleDetailInfoRes> buildArticleList(List<ArticleDetailInfoDto> articleDetailInfoDtos) {
         if(CollectionUtils.isEmpty(articleDetailInfoDtos)){
             return new ArrayList<>();

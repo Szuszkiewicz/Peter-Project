@@ -55,4 +55,13 @@ public interface ArticleService {
      * 统计文章数量
      */
     int countArticle(QueryArticleInfoDto queryArticleInfoDto);
+    /**
+     * 增加文章浏览量
+     */
+    int addViewsCount(Long id);
+    /**
+     * 文章排行
+     *
+     */
+    List<ArticleDetailInfoDto> selectRank();
 }

@@ -15,11 +15,13 @@ import com.Peter.mapper.ArticleMapper;
 import com.Peter.utils.DateUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -82,20 +84,7 @@ public class ArticleServiceImpl implements ArticleService {
             List<ArticleDetailInfoDto> targetList=new ArrayList<>();
             for(int i=0;i<articleList.size();i++){
                 Article article=articleList.get(i);
-                ArticleDetailInfoDto detailInfoDto=new ArticleDetailInfoDto();
-                detailInfoDto.setId(article.getId());
-                detailInfoDto.setUserId(article.getUserId());
-                detailInfoDto.setContent(article.getContent());
-                detailInfoDto.setTitle(article.getTitle());
-                detailInfoDto.setCategoryId(article.getCategoryId());
-                detailInfoDto.setType(article.getType().intValue());
-                detailInfoDto.setCommentsCount(article.getCommentsCount());
-                detailInfoDto.setModule(article.getModule());
-                detailInfoDto.setLikes(article.getLikes());
-                detailInfoDto.setViews(article.getViews());
-                detailInfoDto.setStatus(article.getStatus().intValue());
-                detailInfoDto.setCreateTime(DateUtils.date2Str(article.getCreateTime(), DateUtils.DATE_FORMAT));
-                detailInfoDto.setUpdateTime(DateUtils.date2Str(article.getUpdateTime(), DateUtils.DATE_FORMAT));
+                ArticleDetailInfoDto detailInfoDto = getArticleDetailInfoDto(article);
                 targetList.add(detailInfoDto);
             }
 
@@ -108,6 +97,25 @@ public class ArticleServiceImpl implements ArticleService {
             return new ArrayList<>();
         }
     }
+
+    public  ArticleDetailInfoDto getArticleDetailInfoDto(Article article) {
+        ArticleDetailInfoDto detailInfoDto=new ArticleDetailInfoDto();
+        detailInfoDto.setId(article.getId());
+        detailInfoDto.setUserId(article.getUserId());
+        detailInfoDto.setContent(article.getContent());
+        detailInfoDto.setTitle(article.getTitle());
+        detailInfoDto.setCategoryId(article.getCategoryId());
+        detailInfoDto.setType(article.getType().intValue());
+        detailInfoDto.setCommentsCount(article.getCommentsCount());
+        detailInfoDto.setModule(article.getModule());
+        detailInfoDto.setLikes(article.getLikes());
+        detailInfoDto.setViews(article.getViews());
+        detailInfoDto.setStatus(article.getStatus().intValue());
+        detailInfoDto.setCreateTime(article.getCreateTime() != null ? DateUtils.date2Str(article.getCreateTime(), DateUtils.DATE_FORMAT) : null);
+        detailInfoDto.setUpdateTime(article.getUpdateTime()!= null ? DateUtils.date2Str(article.getUpdateTime(), DateUtils.DATE_FORMAT) : null);
+        return detailInfoDto;
+    }
+
     @Override
     public  ArticleDetailInfoDto queryArticleById(Long id) {
         try {
@@ -163,6 +171,27 @@ public class ArticleServiceImpl implements ArticleService {
         return articleMapper.subtractCollectsCount(id);
     }
     @Override
+    public int addViewsCount(Long id){
+        try {
+            log.info("增加文章浏览数-addViewsCount-service-入参：{}", id);
+            Article article = articleDao.selectByPrimaryKey(id);
+            if (article == null) {
+                log.error("该文章不存在:{}", id);
+                return -1;
+            }
+            if (article.getIsDelete().equals((byte) 1)) {
+                log.error("该文章已被删除:{}", id);
+                return -1;
+            }
+            int count = articleMapper.addViewsCount(id);
+            log.info("增加文章浏览数-addViewsCount-service-出参：{}", count);
+            return count;
+        } catch (Exception e) {
+            log.error("增加文章浏览数-addViewsCount-service-异常:{}", e.getMessage());
+            return -1;
+        }
+    }
+    @Override
     public int countArticle(QueryArticleInfoDto queryArticleInfoDto){
         try {
             log.info("查询文章总数-countArticle-service-入参：{}", JSON.toJSONString(queryArticleInfoDto));
@@ -175,6 +204,36 @@ public class ArticleServiceImpl implements ArticleService {
             return -1;
         }
     }
+    /**
+     * 榜单推荐逻辑：浏览量，取前20条
+     */
+    @Override
+    public List<ArticleDetailInfoDto> selectRank(){
+      List<Article> articleList =articleMapper.selectAll(null,true);
+
+      articleList.stream().sorted((o1, o2)->o2.getViews().compareTo(o1.getViews()))
+              .limit(20)
+              .collect(Collectors.toList());
+
+      List<ArticleDetailInfoDto> articleDetailInfoDtoList=getArticleDetaiInfoDtos(articleList);
+      return articleDetailInfoDtoList;
+    }
+
+    private List<ArticleDetailInfoDto> getArticleDetaiInfoDtos(List<Article> articleList) {
+        if(CollectionUtils.isEmpty(articleList)){
+            return new ArrayList<>();
+        }
+        List<ArticleDetailInfoDto> articleDetailInfoDtoList=new ArrayList<>();
+        for(int i=0;i<articleList.size();i++){
+            Article article=articleList.get(i);
+            ArticleDetailInfoDto articleDetailInfoDto=getArticleDetailInfoDto(article);
+            articleDetailInfoDtoList.add(articleDetailInfoDto);
+        }
+        return articleDetailInfoDtoList;
+    }
+
+
+
 
     private  ArticleExample buildArticleExample(QueryArticleInfoDto queryArticleInfoDto) {
         if(queryArticleInfoDto== null){
