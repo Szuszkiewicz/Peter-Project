@@ -3,12 +3,12 @@ package com.Peter.controller;
 import cn.hutool.core.lang.Assert;
 import com.Peter.ArticleService;
 import com.Peter.Param.*;
+import com.Peter.dao.ArticleDao;
 import com.Peter.dto.ArticleDetailInfoDto;
 import com.Peter.dto.DeleteArticleInfoDto;
 import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.dto.QueryArticleInfoDto;
 import com.Peter.entity.Article;
-import com.Peter.entity.ArticleExample;
 import com.Peter.enums.ArticleTypeEnum;
 import com.Peter.enums.ModuleTypeEnum;
 import com.Peter.utils.BaseResultUtils;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 public class ArticleController {
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private ArticleDao articleDao;
+
     /**
      * 发表文章(新增或修改)
      * @param articleParam
@@ -50,12 +53,21 @@ public class ArticleController {
     }
 
     private void checkPostArticleParam(ArticleParam articleParam) {
-        Assert.isTrue(articleParam!=null, "参数不能为空");
-        Assert.isTrue(articleParam.getUserId()!=null, "用户ID不能为空");
-        Assert.isTrue(articleParam.getModule()!=null, "类型不能为空");
-        Assert.isTrue(articleParam.getTitle()!=null, "类型不能为空");
-        Assert.isTrue(articleParam.getTitle()!=null, "标题不能为空");
-        Assert.isTrue(articleParam.getContent()!=null, "内容不能为空");
+        boolean isUpdate = StringUtils.isNotBlank(articleParam.getId());
+        if(isUpdate){
+            Assert.isTrue(StringUtils.isNotBlank(articleParam.getId()), "文章ID不能为空");
+            //判断id是否存在
+             Article article =articleDao.selectByPrimaryKey(Long.valueOf(articleParam.getId()));
+             Assert.isTrue(article != null, "文章不存在");
+             Assert.isTrue(article.getIsDelete()==0, "文章已被删除");
+        }else {
+            Assert.isTrue(articleParam != null, "参数不能为空");
+            Assert.isTrue(articleParam.getUserId() != null, "用户ID不能为空");
+            Assert.isTrue(articleParam.getModule() != null, "模块不能为空");
+            Assert.isTrue(articleParam.getType() != null, "类型不能为空");
+            Assert.isTrue(articleParam.getTitle() != null, "标题不能为空");
+            Assert.isTrue(articleParam.getContent() != null, "内容不能为空");
+        }
     }
     /**
      * 删除文章
@@ -171,6 +183,16 @@ public class ArticleController {
     public BaseResult<List<ArticleDetailInfoDto>> selectRank(){
         List<ArticleDetailInfoDto> list=articleService.selectRank();
         return BaseResultUtils.generateSuccess(list);
+    }
+
+    /**
+     * 文章推荐
+     * @return
+     */
+    @GetMapping("/selectRecommend/{id}")
+    public BaseResult<Set<ArticleDetailInfoDto>> selectRecommend(@PathVariable Long id){
+        Set<ArticleDetailInfoDto> detailInfoDtoSet =articleService.selectRecommend(id);
+        return BaseResultUtils.generateSuccess(detailInfoDtoSet);
     }
     @PostMapping("/addViews")
     public BaseResult<Boolean> addViews(@RequestParam Long  id){

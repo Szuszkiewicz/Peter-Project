@@ -26,6 +26,9 @@ public class UpdateArticleServiceImpl implements ArticlePostService, Initializin
         article.setContent(postArticleInfoDto.getContent());
         article.setTitle(postArticleInfoDto.getTitle());
         article.setCategoryId(Long.valueOf(postArticleInfoDto.getCategoryId()));
+        article.setTags(postArticleInfoDto.getTags());
+        article.setCover(postArticleInfoDto.getCover());
+        article.setDesc(postArticleInfoDto.getDesc());
         int updateCount=articleDao.updateByPrimaryKeySelective(article);
         log.info("发布文章-PostArticle-service-出参：{}", updateCount);
         return updateCount;

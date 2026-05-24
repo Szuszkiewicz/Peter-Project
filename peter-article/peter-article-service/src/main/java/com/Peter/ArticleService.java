@@ -6,6 +6,7 @@ import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.dto.QueryArticleInfoDto;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ArticleService {
     /**
@@ -64,4 +65,6 @@ public interface ArticleService {
      *
      */
     List<ArticleDetailInfoDto> selectRank();
+
+    Set<ArticleDetailInfoDto> selectRecommend(Long id);
 }
