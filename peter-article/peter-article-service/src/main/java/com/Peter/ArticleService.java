@@ -51,4 +51,8 @@ public interface ArticleService {
      * @return
      */
     int subtractCollectsCount(Long id);
+    /**
+     * 统计文章数量
+     */
+    int countArticle(QueryArticleInfoDto queryArticleInfoDto);
 }

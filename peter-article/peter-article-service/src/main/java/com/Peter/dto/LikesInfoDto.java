@@ -1,5 +1,6 @@
 package com.Peter.dto;
 
+import com.Peter.enums.ArticleTypeEnum;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,7 @@ public class LikesInfoDto {
      */
     private Long userId;
     /**
-     * @see com.Peter.enums.ModuleTypeEnums
+     * @see ArticleTypeEnum
      * 模块
      */
     private Integer module;

@@ -15,14 +15,12 @@ import com.Peter.mapper.ArticleMapper;
 import com.Peter.utils.DateUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Slf4j
 @Service
@@ -115,9 +113,13 @@ public class ArticleServiceImpl implements ArticleService {
         try {
             log.info("查询文章列表-queryArticleById-service-入参：{}", id);
             Article article = articleDao.selectByPrimaryKey(id);
+            if(article==null){
+                log.error("无法查询不存在的文章:{}", id);
+                return null;
+            }
             ArticleDetailInfoDto detailInfoDto = new ArticleDetailInfoDto();
             if (article.getIsDelete().equals((byte) 1)) {
-                log.error("文章已被删除:{}", id);
+                log.error("无法查询已被删除的文章:{}", id);
                 return null;
             }
             detailInfoDto.setId(article.getId());
@@ -160,16 +162,33 @@ public class ArticleServiceImpl implements ArticleService {
     public int subtractCollectsCount(Long id){
         return articleMapper.subtractCollectsCount(id);
     }
+    @Override
+    public int countArticle(QueryArticleInfoDto queryArticleInfoDto){
+        try {
+            log.info("查询文章总数-countArticle-service-入参：{}", JSON.toJSONString(queryArticleInfoDto));
+            ArticleExample articleExample=buildArticleExample(queryArticleInfoDto);
+            int count = Math.toIntExact(articleDao.countByExample(articleExample));
+            log.info("查询文章总数-countArticle-service-出参：{}", count);
+            return count;
+        }catch (Exception e){
+            log.error("查询文章总数-countArticle-service-异常：", e);
+            return -1;
+        }
+    }
 
-    private ArticleExample buildArticleExample(QueryArticleInfoDto queryArticleInfoDto) {
+    private  ArticleExample buildArticleExample(QueryArticleInfoDto queryArticleInfoDto) {
         if(queryArticleInfoDto== null){
             return null;
         }
         ArticleExample articleExample=new ArticleExample();
         ArticleExample.Criteria criteria=articleExample.createCriteria();
-        criteria.andUserIdEqualTo(Long.valueOf(queryArticleInfoDto.getUserId()));
-        criteria.andIsDeleteEqualTo((byte)0);
-        articleExample.setLimit(1000);
+        if(queryArticleInfoDto.getId()!=null) {
+            criteria.andUserIdEqualTo(queryArticleInfoDto.getUserId());
+        }
+        criteria.andIsDeleteEqualTo((byte)0);//判断文章是不是被删除的
+        articleExample.setOffset(buildOffset(queryArticleInfoDto.getPageNum(),queryArticleInfoDto.getPageSize()));
+        articleExample.setLimit(queryArticleInfoDto.getPageSize());
+        articleExample.setOrderByClause("id desc");
         if(queryArticleInfoDto.getModule()!= null){
             criteria.andModuleEqualTo(queryArticleInfoDto.getModule());
         }
@@ -185,7 +204,18 @@ public class ArticleServiceImpl implements ArticleService {
         if(queryArticleInfoDto.getStatus()!=null){
             criteria.andStatusEqualTo(queryArticleInfoDto.getStatus().byteValue());
         }
-        return null;
+       return articleExample;
+    }
+
+    /**
+     * 计算分页偏移量
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    private Long buildOffset(Integer pageNum, Integer pageSize) {
+        Integer offset = (pageNum - 1) * pageSize;
+        return (long)Math.max(0, offset);
     }
 
 
