@@ -7,6 +7,7 @@ import com.Peter.entity.Article;
 import com.Peter.enums.ArticleOperationTypeEnums;
 import com.Peter.factory.ArticleFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,13 @@ public class AddArticleServiceImpl implements ArticlePostService, InitializingBe
         article.setContent(postArticleInfoDto.getContent());
         article.setUserId(Long.valueOf(postArticleInfoDto.getUserId()));
         article.setStatus(postArticleInfoDto.getStatus().byteValue());
+        article.setTags(postArticleInfoDto.getTags());
+        article.setCover(postArticleInfoDto.getCover());
+        article.setDesc(postArticleInfoDto.getDesc());
+        article.setViews(0);
+        if(StringUtils.isEmpty(postArticleInfoDto.getTags())){
+            article.setTags("");
+        }
         int insertCount=articleDao.insertSelective(article);
         if(insertCount>0){
             postArticleInfoDto.setId(article.getId()+"");

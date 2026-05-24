@@ -43,5 +43,16 @@ public class ArticleParam {
      * 每页数量
      */
     private Integer pageSize;
-
+    /**
+     * 封面
+     */
+    private String cover;
+    /**
+     * 标签
+     */
+    private String tags;
+    /**
+     * 简介
+     */
+    private String desc;
 }

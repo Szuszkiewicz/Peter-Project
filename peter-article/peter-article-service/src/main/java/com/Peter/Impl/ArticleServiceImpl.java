@@ -14,13 +14,17 @@ import com.Peter.factory.ArticleFactory;
 import com.Peter.mapper.ArticleMapper;
 import com.Peter.utils.DateUtils;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -110,6 +114,9 @@ public class ArticleServiceImpl implements ArticleService {
         detailInfoDto.setModule(article.getModule());
         detailInfoDto.setLikes(article.getLikes());
         detailInfoDto.setViews(article.getViews());
+        detailInfoDto.setCover(article.getCover());
+        detailInfoDto.setTags(article.getTags());
+        detailInfoDto.setDesc(article.getDesc());
         detailInfoDto.setStatus(article.getStatus().intValue());
         detailInfoDto.setCreateTime(article.getCreateTime() != null ? DateUtils.date2Str(article.getCreateTime(), DateUtils.DATE_FORMAT) : null);
         detailInfoDto.setUpdateTime(article.getUpdateTime()!= null ? DateUtils.date2Str(article.getUpdateTime(), DateUtils.DATE_FORMAT) : null);
@@ -215,11 +222,11 @@ public class ArticleServiceImpl implements ArticleService {
               .limit(20)
               .collect(Collectors.toList());
 
-      List<ArticleDetailInfoDto> articleDetailInfoDtoList=getArticleDetaiInfoDtos(articleList);
+      List<ArticleDetailInfoDto> articleDetailInfoDtoList= getArticleDetailInfoDtos(articleList);
       return articleDetailInfoDtoList;
     }
 
-    private List<ArticleDetailInfoDto> getArticleDetaiInfoDtos(List<Article> articleList) {
+    private List<ArticleDetailInfoDto> getArticleDetailInfoDtos(List<Article> articleList) {
         if(CollectionUtils.isEmpty(articleList)){
             return new ArrayList<>();
         }
@@ -231,8 +238,97 @@ public class ArticleServiceImpl implements ArticleService {
         }
         return articleDetailInfoDtoList;
     }
+    @Override
+    public Set<ArticleDetailInfoDto> selectRecommend(Long id){
+        log.info("开始查询文章推荐，文章ID: {}", id);
+        //根据标签推荐
+        ArticleDetailInfoDto articleDetailInfoDto=this.queryArticleById(id);
+        if(articleDetailInfoDto == null){
+            log.warn("文章不存在，无法获取推荐: {}", id);
+            return new HashSet<>();
+        }
 
+        String tags=articleDetailInfoDto.getTags();
+        log.info("当前文章的标签: {}", tags);
 
+        Set<Article> articleSet=new HashSet<>();
+        List<Article> articleList=articleMapper.selectAll(null, true);
+        log.info("数据库中共有 {} 篇文章", articleList.size());
+
+        if(!StringUtils.isEmpty(tags)){
+            try {
+                JSONArray tagsArr = JSONArray.parseArray(tags);
+                log.info("解析出 {} 个标签(JSON格式)", tagsArr.size());
+                for (Object tag : tagsArr) {
+                    String tagStr = tag.toString();
+                    log.info("正在匹配标签: {}", tagStr);
+                    Set<Article> collect = articleList.stream()
+                            .filter(b -> b.getTags() != null && b.getTags().contains(tagStr))
+                            .filter(b -> !b.getId().equals(id))
+                            .collect(Collectors.toSet());
+                    log.info("标签 '{}' 匹配到 {} 篇文章", tagStr, collect.size());
+                    articleSet.addAll(collect);
+                }
+            } catch (Exception e) {
+                log.warn("tags字段不是JSON格式，按普通文本处理: {}", tags);
+                String[] tagArray = tags.split(",");
+                log.info("拆分出 {} 个标签", tagArray.length);
+                for (String tag : tagArray) {
+                    String trimmedTag = tag.trim();
+                    if (!StringUtils.isEmpty(trimmedTag)) {
+                        log.info("正在匹配标签: {}", trimmedTag);
+                        Set<Article> collect = articleList.stream()
+                                .filter(b -> b.getTags() != null && b.getTags().contains(trimmedTag))
+                                .filter(b -> !b.getId().equals(id))
+                                .collect(Collectors.toSet());
+                        log.info("标签 '{}' 匹配到 {} 篇文章", trimmedTag, collect.size());
+                        articleSet.addAll(collect);
+                    }
+                }
+            }
+        } else {
+            log.info("当前文章没有标签，将返回热门文章");
+        }
+
+        log.info("去重后共匹配到 {} 篇文章", articleSet.size());
+
+        // 如果基于标签的推荐结果为空，或当前文章没有标签，返回热门文章
+        if(articleSet.isEmpty()){
+            log.info("标签推荐结果为空，返回热门文章作为补充");
+            if(articleList != null && !articleList.isEmpty()) {
+                List<Article> hotArticles = articleList.stream()
+                        .filter(a -> !a.getId().equals(id))
+                        .filter(a -> a.getIsDelete() != null && a.getIsDelete() == 0)
+                        .sorted((a1, a2) -> {
+                            Integer views1 = a1.getViews() != null ? a1.getViews() : 0;
+                            Integer views2 = a2.getViews() != null ? a2.getViews() : 0;
+                            return views2.compareTo(views1);
+                        })
+                        .limit(5)
+                        .collect(Collectors.toList());
+                articleSet.addAll(hotArticles);
+                log.info("返回 {} 篇热门文章", hotArticles.size());
+            }
+        }
+
+        //从全集里筛选出五个
+        articleSet = articleSet.stream().limit(5).collect(Collectors.toSet());
+        Set<ArticleDetailInfoDto> resultSet=buildArticleDetailIntoDtoSet(articleSet);
+        log.info("推荐结果: {} 篇文章", resultSet.size());
+
+        return resultSet;
+    }
+
+    private Set<ArticleDetailInfoDto> buildArticleDetailIntoDtoSet(Set<Article> articleSet) {
+        if(CollectionUtils.isEmpty(articleSet)){
+            return new HashSet<>();
+        }
+        Set<ArticleDetailInfoDto> resultSet=new HashSet<>();
+        for(Article article:articleSet){
+            resultSet.add(getArticleDetailInfoDto(article));
+        }
+        return  resultSet;
+    }
 
 
     private  ArticleExample buildArticleExample(QueryArticleInfoDto queryArticleInfoDto) {

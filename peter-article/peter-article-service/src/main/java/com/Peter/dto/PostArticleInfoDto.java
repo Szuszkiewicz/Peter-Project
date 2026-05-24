@@ -34,4 +34,16 @@ public class PostArticleInfoDto {
      * 分类id
      */
     private Integer categoryId;
+    /**
+     * 标签
+     */
+    private String tags;
+    /**
+     * 封面
+     */
+    private String cover;
+    /**
+     * 简介
+     */
+    private String desc;
 }
