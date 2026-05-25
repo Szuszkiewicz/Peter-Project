@@ -85,4 +85,12 @@ public class ArticleDetailInfoRes {
      * 内容
      */
     private String content;
+    /**
+     * 用户名
+     */
+    private  String userName;
+    /**
+     * 用户头像
+     */
+    private String avatar;
 }
