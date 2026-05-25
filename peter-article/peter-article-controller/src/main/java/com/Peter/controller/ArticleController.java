@@ -12,6 +12,7 @@ import com.Peter.entity.Article;
 import com.Peter.enums.ArticleTypeEnum;
 import com.Peter.enums.ModuleTypeEnum;
 import com.Peter.utils.BaseResultUtils;
+import com.Peter.utils.TokenUtils;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -184,8 +185,29 @@ public class ArticleController {
         List<ArticleDetailInfoDto> list=articleService.selectRank();
         return BaseResultUtils.generateSuccess(list);
     }
-
     /**
+     * 分页查询当前用户的文章列表
+     */
+    @GetMapping("/selectUser")
+    public PageResultWrapper<ArticleDetailInfoRes> selectUser(ArticleParam articleParam,
+                                                            @RequestParam(defaultValue="1")Integer pageNum,
+                                                            @RequestParam(defaultValue="10")Integer pageSize){
+        articleParam.setPageNum(pageNum);
+        articleParam.setPageSize(pageSize);
+        articleParam.setModule(ModuleTypeEnum.WEBSITE.getCode());
+        PageResultWrapper<ArticleDetailInfoRes> articleDetailInfoDtoPageResultWrapper=this.queryArticleList(articleParam);
+        if(!articleDetailInfoDtoPageResultWrapper.isSuccess()||CollectionUtils.isEmpty(articleDetailInfoDtoPageResultWrapper.getData())){
+            return PageResultWrapper.absent();
+        }
+        List<ArticleDetailInfoRes> data=articleDetailInfoDtoPageResultWrapper.getData();
+        for(int i=0;i<data.size();i++){
+            ArticleDetailInfoRes articleDetailInfoRes=data.get(i);
+            articleDetailInfoRes.setUserName(TokenUtils.getUsername());
+            articleDetailInfoRes.setAvatar(TokenUtils.getAvatar());
+        }
+        return  PageResultWrapper.page( data, articleDetailInfoDtoPageResultWrapper.getTotal(),pageNum,pageSize);
+    }
+     /**
      * 文章推荐
      * @return
      */
