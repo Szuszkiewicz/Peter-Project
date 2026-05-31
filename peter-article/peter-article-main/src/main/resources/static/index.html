@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peter 内容管理系统</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="brand-mark">P</span>
+          <div>
+            <strong>Peter CMS</strong>
+            <small>文章 / 评论 / 用户</small>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-item active" data-view="articles">文章</button>
+          <button class="nav-item" data-view="articleEditor">写文章</button>
+          <button class="nav-item" data-view="comments">评论</button>
+          <button class="nav-item" data-view="users">用户</button>
+          <button class="nav-item" data-view="categories">分类</button>
+          <button class="nav-item" data-view="settings">设置</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1 id="viewTitle">文章</h1>
+            <p id="viewSubtitle">统一管理文章、评论和用户数据</p>
+          </div>
+          <div class="status-pill" id="apiStatus">服务未连接</div>
+        </header>
+
+        <section class="view active" id="articlesView">
+          <div class="toolbar">
+            <label class="field grow">
+              分类
+              <select id="articleCategoryFilter"></select>
+            </label>
+            <label class="field">
+              状态
+              <select id="articleStatusFilter">
+                <option value="">全部</option>
+                <option value="1">草稿</option>
+                <option value="2">已发布</option>
+              </select>
+            </label>
+            <label class="field">
+              每页
+              <select id="articlePageSize">
+                <option>5</option>
+                <option selected>10</option>
+                <option>20</option>
+              </select>
+            </label>
+            <button class="primary" id="reloadArticles">刷新</button>
+          </div>
+
+          <div class="content-grid">
+            <div class="panel">
+              <div class="panel-head">
+                <h2>文章列表</h2>
+                <span id="articleTotal">0 条</span>
+              </div>
+              <div class="list" id="articleList"></div>
+              <div class="pager">
+                <button id="articlePrev">上一页</button>
+                <span id="articlePageInfo">1 / 1</span>
+                <button id="articleNext">下一页</button>
+              </div>
+            </div>
+            <div class="panel detail-panel" id="articleDetail">
+              <div class="empty">选择一篇文章查看详情</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="articleEditorView">
+          <form class="panel form" id="articleForm">
+            <input type="hidden" id="articleId" />
+            <div class="form-grid">
+              <label class="field span-2">
+                标题
+                <input id="articleTitle" required maxlength="120" />
+              </label>
+              <label class="field">
+                分类
+                <select id="articleCategory"></select>
+              </label>
+              <label class="field">
+                状态
+                <select id="articleStatus">
+                  <option value="2">已发布</option>
+                  <option value="1">草稿</option>
+                </select>
+              </label>
+              <label class="field">
+                类型
+                <select id="articleType">
+                  <option value="1">文章</option>
+                  <option value="2">视频</option>
+                  <option value="3">公告</option>
+                </select>
+              </label>
+              <label class="field">
+                封面 URL
+                <input id="articleCover" placeholder="https://..." />
+              </label>
+              <label class="field span-2">
+                标签
+                <input id="articleTags" placeholder="Java, Spring Boot, MyBatis" />
+              </label>
+              <label class="field span-2">
+                简介
+                <textarea id="articleDesc" rows="3"></textarea>
+              </label>
+              <label class="field span-2">
+                内容
+                <textarea id="articleContent" rows="12" required></textarea>
+              </label>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="clearArticleForm">清空</button>
+              <button class="primary" type="submit">保存文章</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="view" id="commentsView">
+          <div class="toolbar">
+            <label class="field">
+              模块
+              <input id="commentModule" type="number" min="1" />
+            </label>
+            <label class="field">
+              资源 ID
+              <input id="commentResourceId" />
+            </label>
+            <label class="field">
+              评分
+              <select id="commentScoreFilter">
+                <option value="">全部</option>
+                <option value="5">5 分</option>
+                <option value="4">4 分</option>
+                <option value="3">3 分</option>
+                <option value="2">2 分</option>
+                <option value="1">1 分</option>
+              </select>
+            </label>
+            <label class="field">
+              排序
+              <select id="commentOrder">
+                <option value="1">最新</option>
+                <option value="2">最热</option>
+                <option value="3">最早</option>
+              </select>
+            </label>
+            <button class="primary" id="reloadComments">查询</button>
+          </div>
+
+          <div class="split">
+            <form class="panel form" id="commentForm">
+              <h2>发表评论</h2>
+              <label class="field">
+                用户 ID
+                <input id="commentUserId" required />
+              </label>
+              <label class="field">
+                评分
+                <select id="commentScore">
+                  <option value="5">5 分</option>
+                  <option value="4">4 分</option>
+                  <option value="3">3 分</option>
+                  <option value="2">2 分</option>
+                  <option value="1">1 分</option>
+                </select>
+              </label>
+              <label class="field">
+                内容
+                <textarea id="commentContent" rows="7" required></textarea>
+              </label>
+              <div class="form-actions">
+                <button type="button" id="clearCommentForm">清空</button>
+                <button class="primary" type="submit">提交</button>
+              </div>
+            </form>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h2>评论列表</h2>
+                <span id="commentTotal">0 条</span>
+              </div>
+              <div class="list" id="commentList"></div>
+              <div class="pager">
+                <button id="commentPrev">上一页</button>
+                <span id="commentPageInfo">1 / 1</span>
+                <button id="commentNext">下一页</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="usersView">
+          <div class="split">
+            <div class="panel form">
+              <div class="tabs">
+                <button class="tab active" data-user-panel="loginPanel">登录</button>
+                <button class="tab" data-user-panel="registerPanel">注册</button>
+                <button class="tab" data-user-panel="editUserPanel">编辑</button>
+              </div>
+
+              <form class="user-panel active" id="loginPanel">
+                <label class="field">
+                  用户名
+                  <input id="loginUsername" required />
+                </label>
+                <label class="field">
+                  <span class="label-row">
+                    密码
+                    <button class="password-toggle" type="button" data-toggle-password data-target="loginPassword" aria-label="显示密码" title="显示密码">
+                      <span class="eye-icon closed" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <input id="loginPassword" type="password" required />
+                </label>
+                <button class="primary" type="submit">登录</button>
+              </form>
+
+              <form class="user-panel" id="registerPanel">
+                <label class="field">
+                  用户名
+                  <input id="registerUsername" required />
+                </label>
+                <label class="field">
+                  <span class="label-row">
+                    密码
+                    <button class="password-toggle" type="button" data-toggle-password data-target="registerPassword" aria-label="显示密码" title="显示密码">
+                      <span class="eye-icon closed" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <input id="registerPassword" type="password" />
+                </label>
+                <label class="field">
+                  邮箱
+                  <input id="registerEmail" type="email" />
+                </label>
+                <label class="field">
+                  手机
+                  <input id="registerPhone" />
+                </label>
+                <div class="field-error" id="registerAgreementError">请先阅读并勾选同意用户服务协议</div>
+                <label class="check-field">
+                  <input id="registerAgreement" type="checkbox" />
+                  <span>我已阅读并同意</span>
+                  <button class="link-button" id="viewContract" type="button">用户服务协议</button>
+                </label>
+                <button class="primary" type="submit">注册</button>
+              </form>
+
+              <form class="user-panel" id="editUserPanel">
+                <input type="hidden" id="editUserId" />
+                <label class="field">
+                  用户名
+                  <input id="editUsername" required />
+                </label>
+                <label class="field">
+                  邮箱
+                  <input id="editEmail" type="email" />
+                </label>
+                <label class="field">
+                  手机
+                  <input id="editPhone" />
+                </label>
+                <label class="field">
+                  状态
+                  <select id="editStatus">
+                    <option value="1">正常</option>
+                    <option value="2">冻结</option>
+                    <option value="3">注销</option>
+                  </select>
+                </label>
+                <label class="field">
+                  角色
+                  <select id="editRole">
+                    <option value="1">普通用户</option>
+                    <option value="2">管理员</option>
+                  </select>
+                </label>
+                <button class="primary" type="submit">保存用户</button>
+              </form>
+            </div>
+
+            <div class="panel">
+              <div class="toolbar compact">
+                <label class="field grow">
+                  用户名
+                  <input id="userKeyword" placeholder="可为空" />
+                </label>
+                <button id="reloadUsers" class="primary">查询</button>
+              </div>
+              <div class="panel-head">
+                <h2>用户列表</h2>
+                <span id="userTotal">0 人</span>
+              </div>
+              <div class="list" id="userList"></div>
+              <div class="pager">
+                <button id="userPrev">上一页</button>
+                <span id="userPageInfo">1 / 1</span>
+                <button id="userNext">下一页</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="categoriesView">
+          <div class="split">
+            <form class="panel form" id="categoryForm">
+              <h2>分类信息</h2>
+              <input type="hidden" id="categoryEditId" />
+              <label class="field">
+                分类名称
+                <input id="categoryName" required maxlength="40" />
+              </label>
+              <div class="form-actions">
+                <button type="button" id="clearCategoryForm">清空</button>
+                <button class="primary" type="submit">保存分类</button>
+              </div>
+            </form>
+            <div class="panel">
+              <div class="panel-head">
+                <h2>分类列表</h2>
+                <button id="reloadCategories">刷新</button>
+              </div>
+              <div class="list" id="categoryList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="settingsView">
+          <form class="panel form" id="settingsForm">
+            <h2>服务地址与当前用户</h2>
+            <div class="form-grid">
+              <label class="field span-2">
+                文章服务
+                <input id="articleBase" />
+              </label>
+              <label class="field span-2">
+                评论服务
+                <input id="commentBase" />
+              </label>
+              <label class="field span-2">
+                用户服务
+                <input id="userBase" />
+              </label>
+              <label class="field">
+                当前用户 ID
+                <input id="profileUserId" type="number" min="1" />
+              </label>
+              <label class="field">
+                当前用户名
+                <input id="profileUsername" />
+              </label>
+              <label class="field span-2">
+                Token
+                <input id="profileToken" />
+              </label>
+              <label class="field span-2">
+                头像 URL
+                <input id="profileAvatar" />
+              </label>
+            </div>
+            <div class="form-actions">
+              <button class="primary" type="submit">保存设置</button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="modal" id="contractModal" aria-hidden="true">
+      <div class="modal-backdrop" id="closeContractBackdrop"></div>
+      <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="contractTitle">
+        <header class="modal-head">
+          <div>
+            <h2 id="contractTitle">用户服务协议</h2>
+            <p id="contractMeta" class="muted"></p>
+          </div>
+          <button id="closeContract" type="button">关闭</button>
+        </header>
+        <div class="contract-content" id="contractContent">正在加载协议...</div>
+        <div class="form-actions">
+          <button id="agreeFromContract" class="primary" type="button">同意并勾选</button>
+        </div>
+      </section>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
