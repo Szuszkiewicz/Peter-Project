@@ -29,11 +29,6 @@ public class TokenUtils {
     @Resource
     UserRpcService userRpcService;
 
-    @Resource
-    Constants constants;
-
-
-
     @PostConstruct
     public void setUserService(){staticUserService = userRpcService;}
     /**
