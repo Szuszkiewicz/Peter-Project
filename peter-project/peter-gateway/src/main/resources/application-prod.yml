@@ -1,48 +1,50 @@
 spring:
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowed-origins: "*"
-            allowed-methods: "*"
-            allowed-headers: "*"
-      default-filters:
-        - DedupesResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials
-      routes:
-        - id: dtc-comment
-          uri: http://localhost:8488
-          predicates:
-            - Path=/comment/**
-        - id: peter-user
-          uri: http://localhost:8489
-          predicates:
-            - Path=/user/**
-        - id: peter-user-offercall
-          uri: http://localhost:8489
-          predicates:
-            - Path=/offerCall/**
-        - id: peter-article-collect
-          uri: http://localhost:8490
-          predicates:
-            - Path=/collect/**
-        - id: peter-article-likes
-          uri: http://localhost:8490
-          predicates:
-            - Path=/likes/**
-        - id: peter-article
-          uri: http://localhost:8490
-          predicates:
-            - Path=/article/**
-        - id: peter-article-category
-          uri: http://localhost:8490
-          predicates:
-            - Path=/category/**
-        - id: dtc-comment-notifications
-          uri: http://localhost:8488
-          predicates:
-            - Path=/notifications/**
-        - id: dtc-comment-ws
-          uri: http://localhost:8488
-          predicates:
-            - Path=/ws-notification
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowed-origins: "*"
+                allowed-methods: "*"
+                allowed-headers: "*"
+          default-filters:
+            - DedupeResponseHeader=Vary Access-Control-Allow-Origin Access-Control-Allow-Credentials
+          routes:
+            - id: dtc-comment
+              uri: http://localhost:8488
+              predicates:
+                - Path=/comment/**
+            - id: peter-user
+              uri: http://localhost:8489
+              predicates:
+                - Path=/user/**
+            - id: peter-user-offercall
+              uri: http://localhost:8489
+              predicates:
+                - Path=/offerCall/**
+            - id: peter-article-collect
+              uri: http://localhost:8490
+              predicates:
+                - Path=/collect/**
+            - id: peter-article-likes
+              uri: http://localhost:8490
+              predicates:
+                - Path=/likes/**
+            - id: peter-article
+              uri: http://localhost:8490
+              predicates:
+                - Path=/article/**
+            - id: peter-article-category
+              uri: http://localhost:8490
+              predicates:
+                - Path=/category/**
+            - id: dtc-comment-notifications
+              uri: http://localhost:8488
+              predicates:
+                - Path=/notifications/**
+            - id: dtc-comment-ws
+              uri: http://localhost:8488
+              predicates:
+                - Path=/ws-notification

@@ -36,8 +36,8 @@ const $ = (selector) => document.querySelector(selector);
 function defaultSettings() {
   return {
     articleBase: window.location.origin,
-    commentBase: "http://localhost:8488",
-    userBase: "http://localhost:8489",
+    commentBase: window.location.origin,
+    userBase: window.location.origin,
     userId: 1,
     username: "Peter",
     avatar: "",
@@ -49,7 +49,12 @@ function loadSettings() {
   const saved = localStorage.getItem("peterCmsSettings");
   if (!saved) return defaultSettings();
   try {
-    return { ...defaultSettings(), ...JSON.parse(saved) };
+    const settings = { ...defaultSettings(), ...JSON.parse(saved) };
+    if (window.location.origin === "http://localhost:8494") {
+      if (settings.commentBase === "http://localhost:8488") settings.commentBase = window.location.origin;
+      if (settings.userBase === "http://localhost:8489") settings.userBase = window.location.origin;
+    }
+    return settings;
   } catch {
     localStorage.removeItem("peterCmsSettings");
     return defaultSettings();
@@ -558,6 +563,73 @@ async function register(event) {
   $("#registerPanel").reset();
 }
 
+async function sendResetCode() {
+  const email = $("#resetEmail").value.trim();
+  if (!email) {
+    showToast("请先输入邮箱");
+    return;
+  }
+  const button = $("#sendResetCode");
+  button.disabled = true;
+  try {
+    const result = await api("user", "/user/sendCode", {
+      method: "POST",
+      params: { email },
+    });
+    if (result?.data !== true) {
+      throw new Error(result?.message || "验证码发送失败");
+    }
+    showToast("验证码已发送，请查看邮箱");
+    startResetCodeCountdown(60);
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = "发送验证码";
+    throw error;
+  }
+}
+
+function startResetCodeCountdown(seconds) {
+  const button = $("#sendResetCode");
+  let remain = seconds;
+  button.textContent = `${remain}s 后重发`;
+  clearInterval(startResetCodeCountdown.timer);
+  startResetCodeCountdown.timer = setInterval(() => {
+    remain -= 1;
+    if (remain <= 0) {
+      clearInterval(startResetCodeCountdown.timer);
+      button.disabled = false;
+      button.textContent = "发送验证码";
+      return;
+    }
+    button.textContent = `${remain}s 后重发`;
+  }, 1000);
+}
+
+async function resetPassword(event) {
+  event.preventDefault();
+  const newPassword = $("#resetNewPassword").value;
+  const confirmPassword = $("#resetConfirmPassword").value;
+  if (newPassword !== confirmPassword) {
+    showToast("两次输入的密码不一致");
+    return;
+  }
+  const result = await api("user", "/user/update/user/password", {
+    method: "POST",
+    body: {
+      email: $("#resetEmail").value.trim(),
+      verificationCode: $("#resetVerificationCode").value.trim(),
+      newPassword,
+      confirmPassword,
+    },
+  });
+  if (result?.data !== true) {
+    throw new Error(result?.message || "重置密码失败，请检查验证码");
+  }
+  showToast("密码已重置，请重新登录");
+  $("#resetPasswordPanel").reset();
+  openUserPanel("loginPanel");
+}
+
 async function loadContract() {
   if (state.contract) return state.contract;
   const result = await api("user", "/user/contract");
@@ -588,16 +660,28 @@ function closeContract() {
 }
 
 async function loadUsers() {
-  const result = await api("user", "/user/query/user/list", {
-    params: {
-      PageNum: state.userPage,
-      PageSize: state.userPageSize,
-      username: $("#userKeyword").value.trim(),
-    },
-  });
-  state.users = result?.data || [];
-  state.userTotal = Number(result?.total || 0);
-  renderUsers();
+  $("#userList").innerHTML = `<div class="empty">查询中...</div>`;
+  $("#userTotal").textContent = "查询中";
+
+  try {
+    const result = await api("user", "/user/query/user/list", {
+      params: {
+        PageNum: state.userPage,
+        PageSize: state.userPageSize,
+        username: $("#userKeyword").value.trim(),
+      },
+    });
+    state.users = result?.data || [];
+    state.userTotal = Number(result?.total || 0);
+    renderUsers();
+  } catch (error) {
+    state.users = [];
+    state.userTotal = 0;
+    $("#userTotal").textContent = "0 人";
+    $("#userPageInfo").textContent = "1 / 1";
+    $("#userList").innerHTML = `<div class="empty">查询失败：${escapeHtml(error.message)}</div>`;
+    throw error;
+  }
 }
 
 function renderUsers() {
@@ -875,6 +959,9 @@ function bindEvents() {
 
   $("#loginPanel").addEventListener("submit", (event) => login(event).catch((error) => showToast(error.message)));
   $("#registerPanel").addEventListener("submit", (event) => register(event).catch((error) => showToast(error.message)));
+  $("#forgotPassword").addEventListener("click", () => openUserPanel("resetPasswordPanel"));
+  $("#sendResetCode").addEventListener("click", () => sendResetCode().catch((error) => showToast(error.message)));
+  $("#resetPasswordPanel").addEventListener("submit", (event) => resetPassword(event).catch((error) => showToast(error.message)));
   $("#viewContract").addEventListener("click", () => openContract());
   $("#closeContract").addEventListener("click", closeContract);
   $("#closeContractBackdrop").addEventListener("click", closeContract);
@@ -892,6 +979,13 @@ function bindEvents() {
   $("#reloadUsers").addEventListener("click", () => {
     state.userPage = 1;
     loadUsers().catch((error) => showToast(error.message));
+  });
+  $("#userKeyword").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      state.userPage = 1;
+      loadUsers().catch((error) => showToast(error.message));
+    }
   });
   $("#userPrev").addEventListener("click", () => {
     state.userPage = Math.max(1, state.userPage - 1);

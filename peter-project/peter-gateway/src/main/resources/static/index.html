@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Peter 内容管理系统</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="shell">
@@ -224,6 +224,7 @@
                     <button class="password-toggle" type="button" data-toggle-password data-target="loginPassword" aria-label="显示密码" title="显示密码">
                       <span class="eye-icon closed" aria-hidden="true"></span>
                     </button>
+                    <button class="link-button" id="forgotPassword" type="button">忘记密码?</button>
                   </span>
                   <input id="loginPassword" type="password" required />
                 </label>
@@ -259,6 +260,39 @@
                   <button class="link-button" id="viewContract" type="button">用户服务协议</button>
                 </label>
                 <button class="primary" type="submit">注册</button>
+              </form>
+
+              <form class="user-panel" id="resetPasswordPanel">
+                <label class="field">
+                  邮箱
+                  <input id="resetEmail" type="email" required />
+                </label>
+                <div class="inline-actions">
+                  <label class="field grow">
+                    验证码
+                    <input id="resetVerificationCode" required maxlength="8" />
+                  </label>
+                  <button id="sendResetCode" type="button">发送验证码</button>
+                </div>
+                <label class="field">
+                  <span class="label-row">
+                    新密码
+                    <button class="password-toggle" type="button" data-toggle-password data-target="resetNewPassword" aria-label="显示密码" title="显示密码">
+                      <span class="eye-icon closed" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <input id="resetNewPassword" type="password" required />
+                </label>
+                <label class="field">
+                  <span class="label-row">
+                    确认密码
+                    <button class="password-toggle" type="button" data-toggle-password data-target="resetConfirmPassword" aria-label="显示密码" title="显示密码">
+                      <span class="eye-icon closed" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <input id="resetConfirmPassword" type="password" required />
+                </label>
+                <button class="primary" type="submit">重置密码</button>
               </form>
 
               <form class="user-panel" id="editUserPanel">
@@ -300,7 +334,7 @@
                   用户名
                   <input id="userKeyword" placeholder="可为空" />
                 </label>
-                <button id="reloadUsers" class="primary">查询</button>
+                <button id="reloadUsers" class="primary" type="button">查询</button>
               </div>
               <div class="panel-head">
                 <h2>用户列表</h2>
@@ -398,6 +432,6 @@
         </div>
       </section>
     </div>
-    <script src="./app.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
