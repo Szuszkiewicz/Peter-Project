@@ -6,10 +6,14 @@ import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.entity.Article;
 import com.Peter.enums.ArticleOperationTypeEnums;
 import com.Peter.factory.ArticleFactory;
+import com.Peter.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.util.Objects;
 
 /**
  * 修改文章
@@ -22,6 +26,9 @@ public class UpdateArticleServiceImpl implements ArticlePostService, Initializin
     @Override
     public int doAction(PostArticleInfoDto postArticleInfoDto){
         //修改
+        log.info("发布文章-PostArticle-service-入参：{}", postArticleInfoDto);
+        String userId= Objects.requireNonNull(TokenUtils.getUserId()).toString();
+        Assert.isTrue(userId.equals(postArticleInfoDto.getUserId().toString()), "不能修改别人的文章");
         Article article= articleDao.selectByPrimaryKey(Long.valueOf(postArticleInfoDto.getId()));
         article.setContent(postArticleInfoDto.getContent());
         article.setTitle(postArticleInfoDto.getTitle());

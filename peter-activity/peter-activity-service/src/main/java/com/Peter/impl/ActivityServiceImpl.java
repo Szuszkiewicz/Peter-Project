@@ -1,9 +1,13 @@
 package com.Peter.impl;
 
+import Factory.ActivityFactory;
+import com.Peter.ActivityPostService;
 import com.Peter.ActivityService;
 import com.Peter.dao.ActivityDao;
+import com.Peter.dto.DeleteActivityInfoDto;
 import com.Peter.dto.PostActivityInfoDto;
 import com.Peter.entity.Activity;
+import com.Peter.enums.ActivityOperationTypeEnums;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,33 +22,37 @@ public class ActivityServiceImpl implements ActivityService {
     @Override
     public int PostActivity(PostActivityInfoDto postActivityInfoDto){
         try{
-            log.info("发布活动-PostActivity-入参:{}", JSON.toJSONString(postActivityInfoDto));
-            //如果id不为空，则更新活动信息
-            if(postActivityInfoDto.getId() != null){
-                Activity activity = activityDao.selectByPrimaryKey(postActivityInfoDto.getId());
-                activity.setDesc(postActivityInfoDto.getDesc());
-                activity.setName(postActivityInfoDto.getName());
-                activity.setLocation(postActivityInfoDto.getLocation());
-                activity.setTime(postActivityInfoDto.getTime());
-                activity.setCreatorId(postActivityInfoDto.getCreatorId());
-                int updateCount=activityDao.updateByPrimaryKeySelective(activity);
-                log.info("更新活动信息-updateCount:{}",updateCount);
-                return updateCount;
-            }else{
-                Activity activity = new Activity();
-                activity.setDesc(postActivityInfoDto.getDesc());
-                activity.setName(postActivityInfoDto.getName());
-                activity.setLocation(postActivityInfoDto.getLocation());
-                activity.setTime(postActivityInfoDto.getTime());
-                activity.setCreatorId(postActivityInfoDto.getCreatorId());
-                int insertCount=activityDao.insertSelective(activity);
-                log.info("插入活动信息-insertCount:{}",insertCount);
-                return insertCount;
-            }
-
+            //策略模式
+            ActivityPostService activityPostService = ActivityFactory.fetchActivityService(postActivityInfoDto.getId()==null? ActivityOperationTypeEnums.ADD:ActivityOperationTypeEnums.UPDATE);
+            return activityPostService.doAction(postActivityInfoDto);
         }catch (Exception e){
             log.error("发布活动-PostActivity-异常:{}",e.getMessage());
             return -1;
         }
     }
+    @Override
+    public int DeleteActivity(DeleteActivityInfoDto deleteActivityInfoDto){
+        try{
+            log.info("删除活动-DeleteActivity-入参:{}", JSON.toJSONString(deleteActivityInfoDto));
+            Activity activity=activityDao.selectByPrimaryKey(deleteActivityInfoDto.getId());
+            if(activity==null){
+                log.error("删除活动-DeleteActivity-活动不存在");
+                return -1;
+            }if(activity.getIsDelete()==1){
+                log.error("删除活动-DeleteActivity-活动已删除");
+                return -1;
+            }if(!activity.getCreatorId().equals(deleteActivityInfoDto.getCreatorId())){
+                log.error("删除活动-DeleteActivity-用户不匹配，无法删除");
+                return -1;
+            }
+            activity.setIsDelete((byte) 1);
+            int deleteCount = activityDao.updateByPrimaryKeySelective(activity);
+            log.info("删除活动-DeleteActivity-出参:{}", deleteCount);
+            return deleteCount;
+        }catch (Exception e){
+            log.error("删除活动-DeleteActivity-异常:{}",e.getMessage());
+            return -1;
+        }
+    }
+
 }

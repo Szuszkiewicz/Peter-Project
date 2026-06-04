@@ -228,6 +228,48 @@ async function loadArticles() {
   renderArticles();
 }
 
+function isOwnArticle(article) {
+  return String(article?.userId || "") === String(state.settings.userId || "");
+}
+
+function renderArticleActionMenu(article) {
+  const own = isOwnArticle(article);
+  const menuItems = own
+    ? [
+        ["article-reply", "回复"],
+        ["article-copy", "复制"],
+        ["article-edit", "修改"],
+        ["article-collect", "收藏"],
+      ]
+    : [
+        ["article-reply", "回复"],
+        ["article-like", "点赞"],
+        ["article-copy", "复制"],
+        ["article-collect", "收藏"],
+      ];
+
+  return `
+    <details class="action-menu">
+      <summary aria-label="文章操作">操作</summary>
+      <div class="action-menu-panel">
+        ${menuItems
+          .map(([action, label]) => `<button type="button" data-action="${action}" data-id="${article.id}">${label}</button>`)
+          .join("")}
+      </div>
+    </details>
+  `;
+}
+
+function renderArticleQuickActions(article, showDetail = true) {
+  return `
+    <div class="card-actions">
+      ${showDetail ? `<button data-action="article-detail" data-id="${article.id}">详情</button>` : ""}
+      <button data-action="article-like" data-id="${article.id}">点赞/取消</button>
+      <button data-action="article-collect" data-id="${article.id}">收藏/取消</button>
+    </div>
+  `;
+}
+
 function renderArticles() {
   const pageTotal = totalPage(state.articleTotal, state.articlePageSize);
   $("#articleTotal").textContent = `${state.articleTotal} 条`;
@@ -248,9 +290,12 @@ function renderArticles() {
         .join("");
       return `
         <article class="article-card ${String(article.id) === String(state.selectedArticleId) ? "active" : ""}">
-          <div class="article-title">
-            <strong>${escapeHtml(article.title || "未命名文章")}</strong>
-            <span class="tag ${Number(article.status) === 1 ? "warning" : ""}">${statusLabel(article.status)}</span>
+          <div class="article-title article-title-menu">
+            <div>
+              <strong>${escapeHtml(article.title || "未命名文章")}</strong>
+              <span class="tag ${Number(article.status) === 1 ? "warning" : ""}">${statusLabel(article.status)}</span>
+            </div>
+            ${renderArticleActionMenu(article)}
           </div>
           <div class="meta">
             <span>${escapeHtml(categoryName(article.categoryId))}</span>
@@ -261,14 +306,7 @@ function renderArticles() {
           </div>
           ${article.desc ? `<div class="muted">${escapeHtml(article.desc)}</div>` : ""}
           ${tags ? `<div class="meta">${tags}</div>` : ""}
-          <div class="card-actions">
-            <button data-action="article-detail" data-id="${article.id}">详情</button>
-            <button data-action="article-edit" data-id="${article.id}">编辑</button>
-            <button data-action="article-comments" data-id="${article.id}">评论</button>
-            <button data-action="article-like" data-id="${article.id}">点赞/取消</button>
-            <button data-action="article-collect" data-id="${article.id}">收藏/取消</button>
-            <button class="danger" data-action="article-delete" data-id="${article.id}">删除</button>
-          </div>
+          ${renderArticleQuickActions(article)}
         </article>
       `;
     })
@@ -291,7 +329,10 @@ function renderArticleDetail(article) {
     .join("");
   $("#articleDetail").innerHTML = `
     ${article.cover ? `<img class="detail-cover" src="${escapeHtml(article.cover)}" alt="文章封面" />` : ""}
-    <h2 class="detail-title">${escapeHtml(article.title || "未命名文章")}</h2>
+    <div class="detail-title-row">
+      <h2 class="detail-title">${escapeHtml(article.title || "未命名文章")}</h2>
+      ${renderArticleActionMenu(article)}
+    </div>
     <div class="meta">
       <span>${escapeHtml(categoryName(article.categoryId))}</span>
       <span>${typeLabel(article.type)}</span>
@@ -302,10 +343,7 @@ function renderArticleDetail(article) {
     </div>
     ${tags ? `<div class="meta" style="margin-top: 10px">${tags}</div>` : ""}
     ${article.desc ? `<p class="detail-desc">${escapeHtml(article.desc)}</p>` : ""}
-    <div class="card-actions">
-      <button data-action="article-edit" data-id="${article.id}">编辑</button>
-      <button data-action="article-comments" data-id="${article.id}">查看评论</button>
-    </div>
+    ${renderArticleQuickActions(article, false)}
     <div class="detail-content">${escapeHtml(article.content || "")}</div>
     <div class="recommend" id="recommendBox">
       <h3>相关推荐</h3>
@@ -342,6 +380,7 @@ function fillArticleForm(article = {}) {
 async function editArticle(id) {
   const result = await api("article", "/article/query", { params: { id } });
   if (!result?.data) throw new Error("未查询到文章");
+  if (!isOwnArticle(result.data)) throw new Error("不能修改别人的文章");
   fillArticleForm(result.data);
   setView("articleEditor");
 }
@@ -408,12 +447,39 @@ async function setArticleCollect(id) {
   await loadArticles();
 }
 
+async function copyArticle(id) {
+  const result = await api("article", "/article/query", { params: { id } });
+  const article = result?.data;
+  if (!article) throw new Error("未查询到文章");
+  const link = `${window.location.origin}${window.location.pathname}?articleId=${encodeURIComponent(id)}`;
+  const text = `${article.title || "未命名文章"}\n${link}`;
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+  } else {
+    const input = document.createElement("textarea");
+    input.value = text;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.left = "-9999px";
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand("copy");
+    input.remove();
+  }
+  showToast("文章链接已复制");
+}
+
 function openArticleComments(id) {
   $("#commentModule").value = MODULE_WEBSITE;
   $("#commentResourceId").value = id;
   state.commentPage = 1;
   setView("comments");
   loadComments().catch((error) => showToast(error.message));
+}
+
+function replyArticle(id) {
+  openArticleComments(id);
+  window.setTimeout(() => $("#commentContent")?.focus(), 120);
 }
 
 function fillCommentDefaults() {
@@ -886,6 +952,8 @@ function handleAction(event) {
     "article-detail": () => loadArticleDetail(id),
     "article-edit": () => editArticle(id),
     "article-comments": () => openArticleComments(id),
+    "article-reply": () => replyArticle(id),
+    "article-copy": () => copyArticle(id),
     "article-like": () => setArticleLike(id),
     "article-collect": () => setArticleCollect(id),
     "article-delete": () => deleteArticle(id),
@@ -1016,6 +1084,10 @@ async function init() {
   await loadCategories();
   fillArticleForm();
   await loadArticles();
+  const initialArticleId = new URLSearchParams(window.location.search).get("articleId");
+  if (initialArticleId) {
+    await loadArticleDetail(initialArticleId);
+  }
 }
 
 init().catch((error) => {

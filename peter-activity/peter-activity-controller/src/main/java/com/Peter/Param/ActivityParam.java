@@ -33,5 +33,13 @@ public class ActivityParam {
      * 创建者的id
      */
     private String creatorId;
+    /**
+     * 是否删除
+     */
+    private int isDelete;
+    /**
+     * 创建者用户名
+     */
+    private String creatorName;
 
 }

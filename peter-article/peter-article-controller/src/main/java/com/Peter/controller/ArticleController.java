@@ -54,15 +54,21 @@ public class ArticleController {
     }
 
     private void checkPostArticleParam(ArticleParam articleParam) {
+        Long userId = TokenUtils.getUserId();
+        Assert.isTrue(userId != null, "请先登录");
         boolean isUpdate = StringUtils.isNotBlank(articleParam.getId());
         if(isUpdate){
             Assert.isTrue(StringUtils.isNotBlank(articleParam.getId()), "文章ID不能为空");
             //判断id是否存在
              Article article =articleDao.selectByPrimaryKey(Long.valueOf(articleParam.getId()));
              Assert.isTrue(article != null, "文章不存在");
-             Assert.isTrue(article.getIsDelete()==0, "文章已被删除");
+            if (article != null) {
+                Assert.isTrue(article.getIsDelete()==0, "文章已被删除");
+            }
+            if (article != null) {
+                Assert.isTrue(article.getUserId().equals(userId), "无法修改别人的文章");
+            }
         }else {
-            Assert.isTrue(articleParam != null, "参数不能为空");
             Assert.isTrue(articleParam.getUserId() != null, "用户ID不能为空");
             Assert.isTrue(articleParam.getModule() != null, "模块不能为空");
             Assert.isTrue(articleParam.getType() != null, "类型不能为空");

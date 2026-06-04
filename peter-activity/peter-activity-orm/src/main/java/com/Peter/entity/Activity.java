@@ -68,6 +68,11 @@ public class Activity implements Serializable {
      */
     private Date updateTime;
 
+    /**
+     * 发布者用户名
+     */
+    private String username;
+
     private static final long serialVersionUID = 1L;
 
     public Long getId() {
@@ -166,6 +171,14 @@ public class Activity implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
@@ -189,7 +202,8 @@ public class Activity implements Serializable {
             && (this.getIsDelete() == null ? other.getIsDelete() == null : this.getIsDelete().equals(other.getIsDelete()))
             && (this.getViews() == null ? other.getViews() == null : this.getViews().equals(other.getViews()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
+            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
+            && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()));
     }
 
     @Override
@@ -208,6 +222,7 @@ public class Activity implements Serializable {
         result = prime * result + ((getViews() == null) ? 0 : getViews().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
+        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
         return result;
     }
 
@@ -229,6 +244,7 @@ public class Activity implements Serializable {
         sb.append(", views=").append(views);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateTime=").append(updateTime);
+        sb.append(", username=").append(username);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

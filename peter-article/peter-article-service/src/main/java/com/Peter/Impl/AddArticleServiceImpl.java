@@ -6,6 +6,7 @@ import com.Peter.dto.PostArticleInfoDto;
 import com.Peter.entity.Article;
 import com.Peter.enums.ArticleOperationTypeEnums;
 import com.Peter.factory.ArticleFactory;
+import com.Peter.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 /**
  */
 @Slf4j
+@Service
 public class AddArticleServiceImpl implements ArticlePostService, InitializingBean {
     @Autowired
     private ArticleDao articleDao;
