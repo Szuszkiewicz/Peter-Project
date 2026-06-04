@@ -23,6 +23,7 @@
   <modules>
     <module>../peter-user</module>
     <module>../peter-article</module>
+    <module>../peter-activity</module>
     <module>../dtc-comment</module>
       <module>peter-gateway</module>
   </modules>
@@ -82,6 +83,28 @@
       <dependency>
         <groupId>com.Peter</groupId>
         <artifactId>peter-article-controller</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- peter-activity 模块 -->
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-activity-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-activity-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-activity-orm</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.Peter</groupId>
+        <artifactId>peter-activity-controller</artifactId>
         <version>${project.version}</version>
       </dependency>
 
